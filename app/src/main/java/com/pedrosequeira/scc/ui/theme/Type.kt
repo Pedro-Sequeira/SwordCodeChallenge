@@ -1,4 +1,4 @@
-package com.pedrosequeira.swordcodechallenge.ui.theme
+package com.pedrosequeira.scc.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

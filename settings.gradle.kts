@@ -18,3 +18,7 @@ dependencyResolutionManagement {
 rootProject.name = "SwordCodeChallenge"
 
 include(":app")
+include(":data")
+include(":dog-api")
+include(":domain")
+include(":features:images")
