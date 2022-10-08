@@ -9,8 +9,13 @@ internal class ImagesRemoteDataSource @Inject constructor(
 ) : ImagesDataSource {
 
     override suspend fun getImages(): List<DataImage> {
-        return dogsApi.getImages().map {
-            DataImage(it.url.orEmpty())
+        return dogsApi.getImages().map { apiImage ->
+            with(apiImage) {
+                DataImage(
+                    breedName = breeds?.firstOrNull()?.name.orEmpty(),
+                    url = url.orEmpty()
+                )
+            }
         }
     }
 }

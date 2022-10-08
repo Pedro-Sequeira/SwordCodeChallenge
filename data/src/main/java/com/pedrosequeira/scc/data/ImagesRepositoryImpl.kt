@@ -13,7 +13,12 @@ class ImagesRepositoryImpl @Inject constructor(
     override suspend fun getImages(): Flow<List<Image>> {
         return flow {
             emit(imagesDataSource.getImages().map {
-                Image(it.url)
+                with (it) {
+                    Image(
+                        breedName = breedName,
+                        url = url
+                    )
+                }
             })
         }
     }
