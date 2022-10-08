@@ -1,4 +1,4 @@
-package com.pedrosequeira.scc.dog.api.entities
+package com.pedrosequeira.scc.dog.api.entities.dogs
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
