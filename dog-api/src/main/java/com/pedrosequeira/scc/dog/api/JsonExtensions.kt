@@ -7,7 +7,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Converter
 
 @OptIn(ExperimentalSerializationApi::class)
-fun Json.asConverterFactory(): Converter.Factory {
+internal fun Json.asConverterFactory(): Converter.Factory {
     return asConverterFactory("application/json".toMediaType())
 }
 

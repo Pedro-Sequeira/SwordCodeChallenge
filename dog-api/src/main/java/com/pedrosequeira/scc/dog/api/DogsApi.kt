@@ -8,7 +8,7 @@ import com.pedrosequeira.scc.dog.api.entities.dogs.ApiImage
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface DogsApi {
+internal interface DogsApi {
 
     @GET("images/search")
     suspend fun getImages(

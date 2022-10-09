@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiHeight(
+internal data class ApiHeight(
     @SerialName("imperial")
     val imperial: String? = null,
     @SerialName("metric")

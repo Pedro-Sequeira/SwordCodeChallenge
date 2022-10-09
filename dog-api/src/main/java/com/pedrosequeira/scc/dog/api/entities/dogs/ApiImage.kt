@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiImage(
+internal data class ApiImage(
     @SerialName("breeds")
     val breeds: List<ApiBreed?>? = null,
     @SerialName("id")

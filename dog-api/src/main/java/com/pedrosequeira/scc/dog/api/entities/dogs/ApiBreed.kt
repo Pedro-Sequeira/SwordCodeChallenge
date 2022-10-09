@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiBreed(
+internal data class ApiBreed(
     @SerialName("weight")
     val weight: ApiWeight? = null,
     @SerialName("height")
