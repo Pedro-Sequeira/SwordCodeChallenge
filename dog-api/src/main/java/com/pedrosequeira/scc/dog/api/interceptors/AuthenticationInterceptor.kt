@@ -1,7 +1,7 @@
 package com.pedrosequeira.scc.dog.api.interceptors
 
 import com.pedrosequeira.scc.BuildConfig
-import com.pedrosequeira.scc.dog.api.entities.ApiParams.Headers.Request.API_KEY
+import com.pedrosequeira.scc.dog.api.entities.ApiHeaders.Request.API_KEY
 import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response

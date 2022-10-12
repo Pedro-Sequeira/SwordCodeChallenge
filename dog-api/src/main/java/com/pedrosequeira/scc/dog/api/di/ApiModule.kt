@@ -3,6 +3,8 @@ package com.pedrosequeira.scc.dog.api.di
 import com.pedrosequeira.scc.BuildConfig
 import com.pedrosequeira.scc.dog.api.DogsApi
 import com.pedrosequeira.scc.dog.api.asConverterFactory
+import com.pedrosequeira.scc.dog.api.calladapter.ApiResultCallAdapterFactory
+import com.pedrosequeira.scc.dog.api.calladapter.HeadersExtractor
 import com.pedrosequeira.scc.dog.api.interceptors.AuthenticationInterceptor
 import dagger.Module
 import dagger.Provides
@@ -25,11 +27,13 @@ internal object ApiModule {
     @Provides
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
+        callAdapterFactory: ApiResultCallAdapterFactory,
         json: Json
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
+            .addCallAdapterFactory(callAdapterFactory)
             .addConverterFactory(json.asConverterFactory())
             .build()
     }
@@ -42,6 +46,13 @@ internal object ApiModule {
             .newBuilder()
             .addInterceptor(authInterceptor)
             .build()
+    }
+
+    @Provides
+    fun provideApiResultCallAdapterFactory(
+        headersExtractor: HeadersExtractor
+    ): ApiResultCallAdapterFactory {
+        return ApiResultCallAdapterFactory(headersExtractor)
     }
 
     @Provides

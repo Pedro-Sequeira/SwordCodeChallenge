@@ -6,14 +6,12 @@ import javax.inject.Inject
 
 internal class ImagesMapper @Inject constructor() {
 
-    fun mapToDomainImage(dataImage: DataImage): Image = with(dataImage) {
-        return Image(
-            breedName = breedName,
-            url = url
-        )
+    fun mapToDomainImages(dataImages: List<DataImage>): List<Image> {
+        return dataImages.map { image ->
+            Image(
+                breedName = image.breedName,
+                url = image.url
+            )
+        }
     }
-}
-
-internal fun ImagesMapper.mapToDomainImages(dataImages: List<DataImage>): List<Image> {
-    return dataImages.map(::mapToDomainImage)
 }

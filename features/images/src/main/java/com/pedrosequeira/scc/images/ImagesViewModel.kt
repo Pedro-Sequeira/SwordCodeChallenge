@@ -2,6 +2,7 @@ package com.pedrosequeira.scc.images
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pedrosequeira.scc.core.ErrorMapper
 import com.pedrosequeira.scc.domain.Result
 import com.pedrosequeira.scc.domain.entities.Image
 import com.pedrosequeira.scc.domain.entities.nextPage
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 internal class ImagesViewModel @Inject constructor(
-    private val imagesRepository: ImagesRepository
+    private val imagesRepository: ImagesRepository,
+    private val errorMapper: ErrorMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ImagesUiState())
@@ -65,7 +67,7 @@ internal class ImagesViewModel @Inject constructor(
                 isLoading = false
             )
             is Result.Error -> this.copy(
-                errorMessage = result.message
+                errorMessage = errorMapper.mapToMessage(result)
             )
         }
     }

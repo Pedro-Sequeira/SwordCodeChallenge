@@ -1,10 +1,16 @@
 package com.pedrosequeira.scc.data.mappers
 
-import com.pedrosequeira.scc.domain.entities.Pagination
 import com.pedrosequeira.scc.data.entities.DataPagination
+import com.pedrosequeira.scc.domain.entities.Pagination
+import javax.inject.Inject
 
-internal fun DataPagination.toDomain() = Pagination(
-    page = page,
-    totalPages = totalPages,
-    resultsPerPage = resultsPerPage
-)
+internal class PaginationMapper @Inject constructor() {
+
+    internal fun mapToDomain(dataPagination: DataPagination): Pagination = with(dataPagination) {
+        return Pagination(
+            page = page,
+            totalPages = totalPages,
+            resultsPerPage = resultsPerPage
+        )
+    }
+}
