@@ -3,6 +3,7 @@ package com.pedrosequeira.scc.images
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,20 +12,34 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pedrosequeira.scc.images.widgets.ImagesGridView
 
+@Composable
+fun ImagesScreen() {
+    ImagesScreen(viewModel = hiltViewModel())
+}
+
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun ImagesScreen(
-    viewModel: ImagesViewModel = hiltViewModel()
-) {
-    val images = viewModel.images.collectAsStateWithLifecycle(
-        initialValue = emptyList()
-    ).value
+private fun ImagesScreen(viewModel: ImagesViewModel) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    if (images.isNotEmpty()) {
-        ImagesGridView(images)
-    } else {
-        Box(Modifier.fillMaxSize()) {
-            CircularProgressIndicator(Modifier.align(Alignment.Center))
+    when {
+        uiState.images.isNotEmpty() -> {
+            ImagesGridView(uiState.images) {
+                viewModel.onBottomReached()
+            }
+        }
+        uiState.isLoading -> {
+            Box(Modifier.fillMaxSize()) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        }
+        uiState.errorMessage != null -> {
+            Box() {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = uiState.errorMessage
+                )
+            }
         }
     }
 }

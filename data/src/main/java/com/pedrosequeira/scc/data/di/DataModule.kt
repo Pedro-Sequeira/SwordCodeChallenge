@@ -1,7 +1,7 @@
 package com.pedrosequeira.scc.data.di
 
 import com.pedrosequeira.scc.data.ImagesRepositoryImpl
-import com.pedrosequeira.scc.domain.ImagesRepository
+import com.pedrosequeira.scc.domain.repositories.ImagesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
