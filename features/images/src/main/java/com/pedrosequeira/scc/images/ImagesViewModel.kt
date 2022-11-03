@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pedrosequeira.scc.core.ErrorMapper
 import com.pedrosequeira.scc.domain.Result
+import com.pedrosequeira.scc.domain.Result.Error
+import com.pedrosequeira.scc.domain.Result.Success
 import com.pedrosequeira.scc.domain.entities.Image
 import com.pedrosequeira.scc.domain.entities.nextPage
 import com.pedrosequeira.scc.domain.repositories.ImagesRepository
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -27,8 +30,6 @@ internal class ImagesViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ImagesUiState())
     val uiState: StateFlow<ImagesUiState> = _uiState.asStateFlow()
-
-    private var allLoadedImages = emptyList<Image>()
 
     init {
         viewModelScope.launch {
@@ -44,16 +45,15 @@ internal class ImagesViewModel @Inject constructor(
 
     private fun loadImages() {
         viewModelScope.launch {
-            imagesRepository.getImages(page = uiState.value.pagination.page)
+            imagesRepository.getImages(page = _uiState.value.pagination.page)
                 .flowOn(Dispatchers.IO)
-                .map { uiState.value.mapResult(it) }
+                .map { _uiState.value.mapResult(it) }
                 .flowOn(Dispatchers.Default)
                 .onStart { emit(uiState.value.copy(isLoading = true)) }
                 .map { state ->
-                    state.toSuccessState(allLoadedImages + state.images)
+                    state.toSuccessState(state.images)
                 }
                 .collect { state ->
-                    allLoadedImages = state.images
                     _uiState.value = state
                 }
         }
@@ -61,12 +61,13 @@ internal class ImagesViewModel @Inject constructor(
 
     private fun ImagesUiState.mapResult(result: Result<List<Image>>): ImagesUiState {
         return when (result) {
-            is Result.Success -> this.copy(
-                images = result.data,
+            is Success -> this.copy(
+                images = _uiState.value.images + result.data,
                 pagination = result.pagination,
                 isLoading = false
             )
-            is Result.Error -> this.copy(
+
+            is Error -> this.copy(
                 errorMessage = errorMapper.mapToMessage(result)
             )
         }

@@ -22,14 +22,15 @@ import com.pedrosequeira.scc.images.R
 @Composable
 internal fun ImagesGridView(
     images: List<Image>,
+    canLoadMore: Boolean,
     onBottomReached: () -> Unit
 ) {
     val lastIndex = images.lastIndex
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         itemsIndexed(images) { index, image ->
-            if (index == lastIndex) {
-                LaunchedEffect(lastIndex) {
+            if (index == lastIndex && canLoadMore) {
+                LaunchedEffect(index) {
                     onBottomReached()
                 }
             }

@@ -24,15 +24,18 @@ private fun ImagesScreen(viewModel: ImagesViewModel) {
 
     when {
         uiState.images.isNotEmpty() -> {
-            ImagesGridView(uiState.images) {
+            val canLoadMore = uiState.pagination.endReached.not() && uiState.isLoading.not()
+            ImagesGridView(uiState.images, canLoadMore) {
                 viewModel.onBottomReached()
             }
         }
+
         uiState.isLoading -> {
             Box(Modifier.fillMaxSize()) {
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
         }
+
         uiState.errorMessage != null -> {
             Box() {
                 Text(
