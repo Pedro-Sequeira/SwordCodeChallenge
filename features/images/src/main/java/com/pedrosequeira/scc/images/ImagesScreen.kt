@@ -1,7 +1,6 @@
 package com.pedrosequeira.scc.images
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,22 +21,20 @@ fun ImagesScreen() {
 private fun ImagesScreen(viewModel: ImagesViewModel) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    when {
-        uiState.images.isNotEmpty() -> {
-            val canLoadMore = uiState.pagination.endReached.not() && uiState.isLoading.not()
-            ImagesGridView(uiState.images, canLoadMore) {
-                viewModel.onBottomReached()
+    Box() {
+        when {
+            uiState.images.isNotEmpty() -> {
+                val canLoadMore = uiState.pagination.endReached.not() && uiState.isLoading.not()
+                ImagesGridView(uiState.images, canLoadMore) {
+                    viewModel.onBottomReached()
+                }
             }
-        }
 
-        uiState.isLoading -> {
-            Box(Modifier.fillMaxSize()) {
+            uiState.isLoading -> {
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
             }
-        }
 
-        uiState.errorMessage != null -> {
-            Box() {
+            uiState.errorMessage != null -> {
                 Text(
                     modifier = Modifier.align(Alignment.Center),
                     text = uiState.errorMessage

@@ -8,24 +8,25 @@ import com.pedrosequeira.scc.domain.Result.Error
 import com.pedrosequeira.scc.domain.Result.Success
 import com.pedrosequeira.scc.domain.entities.Image
 import com.pedrosequeira.scc.domain.entities.nextPage
+import com.pedrosequeira.scc.domain.providers.DispatcherProvider
 import com.pedrosequeira.scc.domain.repositories.ImagesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 internal class ImagesViewModel @Inject constructor(
     private val imagesRepository: ImagesRepository,
-    private val errorMapper: ErrorMapper
+    private val errorMapper: ErrorMapper,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ImagesUiState())
@@ -43,13 +44,14 @@ internal class ImagesViewModel @Inject constructor(
         }
     }
 
-    private fun loadImages() {
+    private fun loadImages() = with(_uiState.value) {
         viewModelScope.launch {
-            imagesRepository.getImages(page = _uiState.value.pagination.page)
-                .flowOn(Dispatchers.IO)
-                .map { _uiState.value.mapResult(it) }
-                .flowOn(Dispatchers.Default)
-                .onStart { emit(uiState.value.copy(isLoading = true)) }
+            imagesRepository.getImages(page = pagination.page)
+                .flowOn(dispatcherProvider.io)
+                .map { mapResult(it) }
+                .flowOn(dispatcherProvider.computation)
+                .onStart { emit(copy(isLoading = true)) }
+                .onCompletion { emit(copy(isLoading = false)) }
                 .map { state ->
                     state.toSuccessState(state.images)
                 }
@@ -64,10 +66,11 @@ internal class ImagesViewModel @Inject constructor(
             is Success -> this.copy(
                 images = _uiState.value.images + result.data,
                 pagination = result.pagination,
-                isLoading = false
+                errorMessage = null
             )
 
             is Error -> this.copy(
+                images = emptyList(),
                 errorMessage = errorMapper.mapToMessage(result)
             )
         }
