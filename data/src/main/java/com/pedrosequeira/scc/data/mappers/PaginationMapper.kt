@@ -6,7 +6,9 @@ import javax.inject.Inject
 
 internal class PaginationMapper @Inject constructor() {
 
-    internal fun mapToDomain(dataPagination: DataPagination): Pagination = with(dataPagination) {
+    internal fun mapToDomainPagination(
+        dataPagination: DataPagination
+    ): Pagination = with(dataPagination) {
         return Pagination(
             page = page,
             totalPages = totalPages,

@@ -18,16 +18,14 @@ internal class ImagesRepositoryImpl @Inject constructor(
     private val errorMapper: ErrorMapper
 ) : ImagesRepository {
 
-    override suspend fun getImages(page: Int): Flow<Result<List<Image>>> {
-        return flow {
-            val result = imagesDataSource.getImages(page = page)
-            emit(
-                result.mapEither(
-                    paginationMapping = paginationMapper::mapToDomain,
-                    success = imagesMapper::mapToDomainImages,
-                    failure = errorMapper::mapToDomainError
-                )
+    override fun getImages(page: Int): Flow<Result<List<Image>>> = flow {
+        val result = imagesDataSource.getImages(page = page)
+        emit(
+            result.mapEither(
+                paginationMapping = paginationMapper::mapToDomainPagination,
+                success = imagesMapper::mapToDomainImages,
+                failure = errorMapper::mapToDomainError
             )
-        }
+        )
     }
 }

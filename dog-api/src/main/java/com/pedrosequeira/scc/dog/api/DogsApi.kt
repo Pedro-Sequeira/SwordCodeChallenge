@@ -13,9 +13,9 @@ internal interface DogsApi {
 
     @GET("images/search")
     suspend fun getImages(
-        @Query(ONLY_WITH_BREED_INFO) onlyWithBreedInfo: Boolean = true,
+        @Query(PAGE) page: Int,
         @Query(ORDERING) ordering: String = "ASC",
-        @Query(PAGE) page: Int = 0,
-        @Query(ITEMS_PER_PAGE) itemsPerPage: Int = 25
+        @Query(ITEMS_PER_PAGE) itemsPerPage: Int = 24,
+        @Query(ONLY_WITH_BREED_INFO) onlyWithBreedInfo: Boolean = true
     ): ApiResult<List<ApiImage>>
 }

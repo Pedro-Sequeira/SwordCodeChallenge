@@ -6,8 +6,6 @@ data class Pagination(
     val resultsPerPage: Int = 0
 ) {
     val endReached = page == totalPages
-}
 
-fun Pagination.nextPage(): Pagination {
-    return copy(page = (page.plus(1)))
+    fun nextPage() = copy(page = (page.plus(1)))
 }

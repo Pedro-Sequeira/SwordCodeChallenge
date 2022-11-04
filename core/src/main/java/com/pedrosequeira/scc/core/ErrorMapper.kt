@@ -1,29 +1,35 @@
 package com.pedrosequeira.scc.core
 
-import com.pedrosequeira.scc.domain.Result
+import com.pedrosequeira.scc.domain.Result.Error
+import com.pedrosequeira.scc.domain.Result.Error.ApiError
+import com.pedrosequeira.scc.domain.Result.Error.ApiError.ClientError
+import com.pedrosequeira.scc.domain.Result.Error.ApiError.NetworkError
+import com.pedrosequeira.scc.domain.Result.Error.ApiError.ServiceUnavailable
+import com.pedrosequeira.scc.domain.Result.Error.NotFound
+import com.pedrosequeira.scc.domain.Result.Error.Unknown
 import javax.inject.Inject
 
 class ErrorMapper @Inject constructor(
     private val stringProvider: StringProvider
 ) {
 
-    fun mapToMessage(error: Result.Error): String {
+    fun mapToMessage(error: Error): String {
         return when (error) {
-            is Result.Error.ApiError -> error.toMessage()
-
-            is Result.Error.NotFound,
-            is Result.Error.Unknown -> stringProvider.getString(R.string.error_unknown_message)
+            is ApiError -> error.toMessage()
+            is NotFound,
+            is Unknown -> stringProvider.getString(R.string.error_unknown_message)
         }
     }
 
-    private fun Result.Error.ApiError.toMessage(): String {
+    private fun ApiError.toMessage(): String {
         return stringProvider.getString(
             when (this) {
-                is Result.Error.ApiError.NetworkError -> R.string.error_api_network_message
-                is Result.Error.ApiError.ServiceUnavailable -> R.string.error_api_server_message
-
-                is Result.Error.ApiError.ClientError,
-                is Result.Error.ApiError.Unknown -> R.string.error_api_unknown_message
+                is NetworkError -> R.string.error_api_network_message
+                is ServiceUnavailable -> R.string.error_api_server_message
+                is ClientError,
+                is ApiError.Unknown -> {
+                    R.string.error_api_unknown_message
+                }
             }
         )
     }

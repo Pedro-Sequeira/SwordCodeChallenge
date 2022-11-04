@@ -7,7 +7,6 @@ import com.pedrosequeira.scc.domain.Result
 import com.pedrosequeira.scc.domain.Result.Error
 import com.pedrosequeira.scc.domain.Result.Success
 import com.pedrosequeira.scc.domain.entities.Image
-import com.pedrosequeira.scc.domain.entities.nextPage
 import com.pedrosequeira.scc.domain.providers.DispatcherProvider
 import com.pedrosequeira.scc.domain.repositories.ImagesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +15,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -44,35 +45,21 @@ internal class ImagesViewModel @Inject constructor(
         }
     }
 
-    private fun loadImages() = with(_uiState.value) {
-        viewModelScope.launch {
-            imagesRepository.getImages(page = pagination.page)
-                .flowOn(dispatcherProvider.io)
-                .map { mapResult(it) }
-                .flowOn(dispatcherProvider.computation)
-                .onStart { emit(copy(isLoading = true)) }
-                .onCompletion { emit(copy(isLoading = false)) }
-                .map { state ->
-                    state.toSuccessState(state.images)
-                }
-                .collect { state ->
-                    _uiState.value = state
-                }
-        }
+    private fun loadImages() {
+        imagesRepository.getImages(page = _uiState.value.pagination.page)
+            .flowOn(dispatcherProvider.io)
+            .map { _uiState.value.mapResult(it) }
+            .flowOn(dispatcherProvider.computation)
+            .onStart { emit(_uiState.value.copy(isLoading = true)) }
+            .onCompletion { emit(_uiState.value.copy(isLoading = false)) }
+            .onEach { _uiState.value = it }
+            .launchIn(viewModelScope)
     }
 
     private fun ImagesUiState.mapResult(result: Result<List<Image>>): ImagesUiState {
         return when (result) {
-            is Success -> this.copy(
-                images = _uiState.value.images + result.data,
-                pagination = result.pagination,
-                errorMessage = null
-            )
-
-            is Error -> this.copy(
-                images = emptyList(),
-                errorMessage = errorMapper.mapToMessage(result)
-            )
+            is Success -> this.toSuccessState(result)
+            is Error -> this.toErrorState(errorMapper.mapToMessage(result))
         }
     }
 

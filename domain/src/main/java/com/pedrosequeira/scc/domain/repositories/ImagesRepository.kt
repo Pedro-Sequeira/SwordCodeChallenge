@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ImagesRepository {
 
-    suspend fun getImages(page: Int): Flow<Result<List<Image>>>
+    fun getImages(page: Int): Flow<Result<List<Image>>>
 }
